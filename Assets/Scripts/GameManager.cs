@@ -1,26 +1,32 @@
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI highScoreText;
-
     private PlayerController pc;
 
+    public AudioClip milestoneSound;
+    private AudioSource gameManagerAudio;
+
     private float score;
+    private int lastMilestoneScore = 0;
 
     void Start()
     {
         pc = GameObject.Find("Player").GetComponent<PlayerController>();
+        gameManagerAudio = GetComponent<AudioSource>();
 
         score = 0;
+        lastMilestoneScore = 0;
 
         if (highScoreText != null)
         {
             float highScore = PlayerPrefs.GetFloat("HighScore", 0);
             highScoreText.text = "Best: " + Mathf.FloorToInt(highScore);
         }
+
     }
 
     void Update()
@@ -31,6 +37,8 @@ public class GameManager : MonoBehaviour
 
             //update le score de lecran
             scoreText.text = "Score: " + Mathf.FloorToInt(score);
+
+            CheckMilestone();
         }
         else
         {
@@ -52,6 +60,24 @@ public class GameManager : MonoBehaviour
             {
                 highScoreText.text = "Best: " + Mathf.FloorToInt(score);
             }
+        }
+    }
+
+    void CheckMilestone()
+    {
+        int currentScoreInt = Mathf.FloorToInt(score);
+
+        int currentMilestone = (currentScoreInt / 100) * 100;
+
+        if (currentMilestone > lastMilestoneScore && currentMilestone >= 100)
+        {
+            if (gameManagerAudio != null && milestoneSound != null)
+            {
+                gameManagerAudio.PlayOneShot(milestoneSound);
+            }
+
+            lastMilestoneScore = currentMilestone;
+
         }
     }
 }
