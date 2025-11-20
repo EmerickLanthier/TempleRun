@@ -8,12 +8,12 @@ public class MoveLeft : MonoBehaviour
 
     void Start()
     {
-        playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();   
+        playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
     void Update()
     {
-        if (playerControllerScript.gameOver == false) 
+        if (playerControllerScript.gameOver == false)
         {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
         }
