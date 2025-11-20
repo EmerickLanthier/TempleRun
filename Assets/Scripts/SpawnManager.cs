@@ -2,28 +2,45 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    public GameObject obstaclePrefab;
-    private Vector3 spawnPos = new Vector3(25, 0, 0);
-    private float startDelay = 2;
-    private float repeatRate = 2;
-    private PlayerController playerControllerScript;
-
-    void Start()
+    [System.Serializable]
+    public struct SpawnableObject
     {
-        InvokeRepeating("SpawnObstacle", startDelay, repeatRate);
-        playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
+        public GameObject prefab;
+        [Range(0f, 1f)]
+        public float spawnChance;
     }
 
-    void Update()
-    {
+    public SpawnableObject[] objects;
 
+    public float minSpawnRate = 1f;
+    public float maxSpawnRate = 2f;
+
+    private void OnEnable()
+    {
+        Invoke(nameof(Spawn), Random.Range(minSpawnRate, maxSpawnRate));
     }
 
-    void SpawnObstacle()
+    private void OnDisable()
     {
-        if (playerControllerScript.gameOver == false)
+        CancelInvoke();
+    }
+
+    private void Spawn()
+    {
+        float spawnChance = Random.value;
+
+        foreach (var obj in objects)
         {
-            _ = Instantiate(obstaclePrefab, spawnPos, obstaclePrefab.transform.rotation);
+            if (spawnChance < obj.spawnChance)
+            {
+                GameObject obstacle = Instantiate(obj.prefab);
+                obstacle.transform.position += transform.position;
+                break;
+            }
+
+            spawnChance -= obj.spawnChance;
         }
+
+        Invoke(nameof(Spawn), Random.Range(minSpawnRate, maxSpawnRate));
     }
 }
